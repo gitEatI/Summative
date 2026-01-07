@@ -1,15 +1,15 @@
 public class ElementCard extends Card {
 
-    private String element;
+    private Element element;
 
-    public ElementCard(String e) {
+    public ElementCard(Element e) {
         super(1);
         this.element = e;
     }
-    public String getElement() {
+    public Element getElement() {
         return element;
     }
-    public void setElementType(String e) {
-        this.element = element;
+    public void setElementType(Element e) {
+        this.element = e;
     }
 }
