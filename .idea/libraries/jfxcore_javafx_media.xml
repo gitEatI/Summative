@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="jfxcore.javafx.media" type="repository">
+    <properties maven-id="org.jfxcore:javafx-media:RELEASE" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-media/18-ea+1/javafx-media-18-ea+1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-media/18-ea+1/javafx-media-18-ea+1-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-graphics/18-ea+1/javafx-graphics-18-ea+1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-graphics/18-ea+1/javafx-graphics-18-ea+1-win.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-base/18-ea+1/javafx-base-18-ea+1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jfxcore/javafx-base/18-ea+1/javafx-base-18-ea+1-win.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
