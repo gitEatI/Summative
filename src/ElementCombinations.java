@@ -1,6 +1,6 @@
 import java.util.Arrays;
 import java.util.HashMap;
-public class ElementCombinations {
+public class  ElementCombinations {
 
     private HashMap<String, Element> combos;
     //private HashMap<String, Element> threeCombos;
@@ -39,13 +39,6 @@ public class ElementCombinations {
         combos.put("EARTH+PLASMA", Element.METAL);
         combos.put("EARTH+ICE", Element.GLACIER);
         combos.put("PLASMA+WATER", Element.BLOOD);
-
-        //Advanced+Advanced for player satisfaction(blaze counts as fire) (maybe)
-//        combos.put("BLAZE+SAND", Element.GLASS);
-//        combos.put("QUICK+TSUNAMI", Element.SLIME);
-//        combos.put("MOUNTAIN+PLASMA", Element.METAL);
-//        combos.put("ICE+MOUNTAIN", Element.GLACIER);
-//        combos.put("PLASMA+TSUNAMI", Element.BLOOD);
     }
 
     public Element combine(Element a, Element b) {
@@ -56,14 +49,5 @@ public class ElementCombinations {
         String key = names[0] + "+" + names[1];
         return combos.get(key);
     }
-
-//    public Element combineThree(Element a, Element b, Element c) {
-//        String[] names = {a.name(), b.name(), c.name()};
-//
-//        Arrays.sort(names);
-//
-//        String key = names[0] + "+" + names[1] + "+" + names[2];
-//        return threeCombos.get(key);
-//    }
 }
 
