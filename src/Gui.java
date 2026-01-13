@@ -13,11 +13,14 @@ public class Gui extends JFrame implements KeyListener {
     //Card placement hitboxes
     JLabel elementPlacebox;
     JLabel spellPlacebox;
-    JLabel utilityPlacebox;
+    JLabel elementPlacebox2;
 
     //ArrayLists
     ArrayList<Card> deck;
     ArrayList<Card> hand;
+
+    //Current card
+    JLabel currentLabel;
 
     public Gui() {
         //Set frame
@@ -71,9 +74,9 @@ public class Gui extends JFrame implements KeyListener {
 
         elementPlacebox = new JLabel("Element", SwingConstants.CENTER);
         spellPlacebox = new JLabel("Spell", SwingConstants.CENTER);
-        utilityPlacebox = new JLabel("Utility", SwingConstants.CENTER);
+        elementPlacebox2 = new JLabel("Element", SwingConstants.CENTER);
 
-        for (JLabel box : new JLabel[]{elementPlacebox, spellPlacebox, utilityPlacebox}) {
+        for (JLabel box : new JLabel[]{elementPlacebox, spellPlacebox, elementPlacebox2}) {
             box.setPreferredSize(boxSize);
             box.setMaximumSize(boxSize);
             box.setOpaque(true);
@@ -84,11 +87,11 @@ public class Gui extends JFrame implements KeyListener {
         //Center horizontally using glue and struts
         horizontalWrapper.add(Box.createHorizontalGlue());
         horizontalWrapper.add(elementPlacebox);
-        horizontalWrapper.add(Box.createHorizontalStrut(20));
+        horizontalWrapper.add(Box.createHorizontalStrut(150));
+        horizontalWrapper.add(elementPlacebox2);
+        horizontalWrapper.add(Box.createHorizontalStrut(150));
         horizontalWrapper.add(spellPlacebox);
-        horizontalWrapper.add(Box.createHorizontalStrut(20));
-        horizontalWrapper.add(utilityPlacebox);
-        horizontalWrapper.add(Box.createHorizontalStrut(20));
+        horizontalWrapper.add(Box.createHorizontalStrut(150));
         horizontalWrapper.add(Box.createHorizontalGlue());
 
         //Center on the vertically
@@ -100,13 +103,46 @@ public class Gui extends JFrame implements KeyListener {
         verticalWrapper.add(Box.createVerticalGlue());
 
         placementPanel.add(verticalWrapper, BorderLayout.EAST);
-
+        //Set timer to check collisions
+        Timer timer = new Timer(16, e -> update()); // ~60 FPS
+        timer.start();
 
         Card fire = new ElementCard(Element.FIRE);
         createCard(fire);
-
         setVisible(true);
     }
+    private void update() {
+        if (currentLabel == null) {
+            return;
+        }
+        Rectangle cl = SwingUtilities.convertRectangle(
+                currentLabel.getParent(),
+                currentLabel.getBounds(),
+                layers
+        );
+
+        Rectangle pb1 = SwingUtilities.convertRectangle(
+                elementPlacebox.getParent(),
+                elementPlacebox.getBounds(),
+                layers
+        );
+        Rectangle pb2 = SwingUtilities.convertRectangle(
+                spellPlacebox.getParent(),
+                spellPlacebox.getBounds(),
+                layers
+        );
+        Rectangle pb3 = SwingUtilities.convertRectangle(
+                elementPlacebox2.getParent(),
+                elementPlacebox2.getBounds(),
+                layers
+        );
+        if (cl.intersects(pb1)) {
+            System.out.println("Collision!");
+        }
+        repaint();
+    }
+
+
     public void createCard(Card c)
     {
         //Label and settings
@@ -124,6 +160,7 @@ public class Gui extends JFrame implements KeyListener {
         MouseAdapter dragAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                currentLabel=card;
                 clickOffset.x = e.getX();
                 clickOffset.y = e.getY();
             }
