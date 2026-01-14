@@ -21,6 +21,7 @@ public class Gui extends JFrame implements KeyListener {
 
     //Current card
     JLabel currentLabel;
+    Rectangle collision;
 
     public Gui() {
         //Set frame
@@ -137,9 +138,18 @@ public class Gui extends JFrame implements KeyListener {
                 layers
         );
         if (cl.intersects(pb1)) {
-            System.out.println("Collision!");
+            collision =pb1;
+        }
+        else if(cl.intersects(pb2))
+        {
+            collision =pb2;
+        }
+        else if(cl.intersects(pb3))
+        {
+            collision =pb3;
         }
         repaint();
+
     }
 
 
@@ -154,7 +164,8 @@ public class Gui extends JFrame implements KeyListener {
         cardPanel.add(card);
         card.setVisible(true);
         this.repaint();
-
+        //Drag variables
+        boolean dragable = true;
         //Dragging
         Point clickOffset = new Point();
         MouseAdapter dragAdapter = new MouseAdapter() {
@@ -166,9 +177,26 @@ public class Gui extends JFrame implements KeyListener {
             }
             @Override
             public void mouseDragged(MouseEvent e) {
-                int x = card.getX() + e.getX() - clickOffset.x;
-                int y = card.getY() + e.getY() - clickOffset.y;
-                card.setLocation(x, y);
+                if(dragable==true) {
+                    int x = card.getX() + e.getX() - clickOffset.x;
+                    int y = card.getY() + e.getY() - clickOffset.y;
+                    card.setLocation(x, y);
+                }
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point p = SwingUtilities.convertPoint(
+                        card,
+                        e.getPoint(),
+                        layers
+                );
+
+                if (collision != null && collision.contains(p)) {
+
+                }
+                else {
+
+                }
             }
         };
         card.addMouseListener(dragAdapter);
