@@ -23,6 +23,7 @@ public class Gui extends JFrame implements KeyListener {
     //Current card
     JLabel currentLabel;
     Rectangle collision;
+    int collisionType;//1 2 or 3
 
     public Gui() {
         //Set frame
@@ -131,26 +132,29 @@ public class Gui extends JFrame implements KeyListener {
                 elementPlacebox.getBounds(),
                 layers
         );
-        Rectangle pb2 = SwingUtilities.convertRectangle(
+        Rectangle pb3 = SwingUtilities.convertRectangle(
                 spellPlacebox.getParent(),
                 spellPlacebox.getBounds(),
                 layers
         );
-        Rectangle pb3 = SwingUtilities.convertRectangle(
+        Rectangle pb2 = SwingUtilities.convertRectangle(
                 elementPlacebox2.getParent(),
                 elementPlacebox2.getBounds(),
                 layers
         );
         if (cl.intersects(pb1)) {
-            collision =pb1;
+            collision = pb1;
+            collisionType = 1;
         }
         else if(cl.intersects(pb2))
         {
-            collision =pb2;
+            collision = pb2;
+            collisionType = 1;
         }
         else if(cl.intersects(pb3))
         {
-            collision =pb3;
+            collision = pb3;
+            collisionType = 2;
         }
         repaint();
     }
@@ -166,8 +170,23 @@ public class Gui extends JFrame implements KeyListener {
 
     public void createCard(Card c)
     {
-        //Label and settings
-        JLabel card = new JLabel();
+        //Label and text info
+
+        JLabel card;
+        if (c instanceof ElementCard elementCard) {
+            card = new JLabel(""+c.getCardType()+elementCard.getElement());
+        }
+        else  if (c instanceof SpellCard spellCard) {
+            card = new JLabel(""+c.getCardType()+spellCard.getSpellType());
+        }
+        //else if(c.getCardType()==3) {}
+        else
+        {
+            card = new JLabel();
+        }
+
+
+
         card.setBounds(0,0,200,300);
         card.setBackground(Color.BLACK);
         card.setForeground(Color.WHITE);
@@ -189,10 +208,8 @@ public class Gui extends JFrame implements KeyListener {
                     clickOffset.y = e.getY();
                     hand.remove(card);
                     drawHand();
-                    System.out.println("mouse pressed");
                 }
             }
-
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (currentLabel == card && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
@@ -205,8 +222,6 @@ public class Gui extends JFrame implements KeyListener {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (currentLabel != card || !SwingUtilities.isLeftMouseButton(e)) return;
-
-                System.out.println("mouse released");
                 Point p = SwingUtilities.convertPoint(
                         card,
                         e.getPoint(),
@@ -214,7 +229,20 @@ public class Gui extends JFrame implements KeyListener {
                 );
 
                 if (collision != null && collision.contains(p)) {
-
+                    //String rest = str.substring(1);
+                    char CardType = card.getText().charAt(0);
+                    if (collisionType==1&&CardType=='1') {
+                        attack.add(card);
+                        System.out.println("hey");
+                    }
+                    else if(collisionType==2&&CardType=='2') {
+                        attack.add(card);
+                    }
+                    else {
+                        //Add back to hand
+                        hand.add(card);
+                        drawHand();
+                    }
                 }
                 else {
                     // Add back to hand
@@ -227,19 +255,6 @@ public class Gui extends JFrame implements KeyListener {
         };
         card.addMouseListener(dragAdapter);
         card.addMouseMotionListener(dragAdapter);
-        //Card information
-        if (c instanceof ElementCard ec) {
-            card.setText(ec.getElement().name());
-            card.setHorizontalAlignment(SwingConstants.CENTER);
-            card.setVerticalAlignment(SwingConstants.CENTER);
-        }
-        else if(c.cardType==2){
-
-        }
-        else if(c.cardType==3) {
-
-        }
-
     }
 
     @Override

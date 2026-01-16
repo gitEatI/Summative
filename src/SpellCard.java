@@ -1,15 +1,15 @@
 public class SpellCard extends Card {
 
-    private int spellType;
+    private Spell spellType;
 
-    public SpellCard(int st) {
+    public SpellCard(Spell st) {
         super(2);
         this.spellType = st;
     }
-    public void setSpellType(int st) {
+    public void setSpellType(Spell st) {
         this.spellType = st;
     }
-    public int getSpellType() {
+    public Spell getSpellType() {
         return spellType;
     }
 
