@@ -16,8 +16,9 @@ public class Gui extends JFrame implements KeyListener {
     JLabel elementPlacebox2;
 
     //ArrayLists
-    ArrayList<Card> deck;
-    ArrayList<Card> hand;
+    ArrayList<Card> deck = new ArrayList<>();
+    ArrayList<JLabel> hand = new ArrayList<>();
+    ArrayList<JLabel> attack = new ArrayList<>();
 
     //Current card
     JLabel currentLabel;
@@ -77,12 +78,12 @@ public class Gui extends JFrame implements KeyListener {
         spellPlacebox = new JLabel("Spell", SwingConstants.CENTER);
         elementPlacebox2 = new JLabel("Element", SwingConstants.CENTER);
 
-        for (JLabel box : new JLabel[]{elementPlacebox, spellPlacebox, elementPlacebox2}) {
-            box.setPreferredSize(boxSize);
-            box.setMaximumSize(boxSize);
-            box.setOpaque(true);
-            box.setBackground(Color.BLACK);
-            box.setForeground(Color.WHITE);
+        for (JLabel i : new JLabel[]{elementPlacebox, spellPlacebox, elementPlacebox2}) {
+            i.setPreferredSize(boxSize);
+            i.setMaximumSize(boxSize);
+            i.setOpaque(true);
+            i.setBackground(Color.BLACK);
+            i.setForeground(Color.WHITE);
         }
 
         //Center horizontally using glue and struts
@@ -110,6 +111,9 @@ public class Gui extends JFrame implements KeyListener {
 
         Card fire = new ElementCard(Element.FIRE);
         createCard(fire);
+        createCard(fire);
+        createCard(fire);
+        drawHand();
         setVisible(true);
     }
     private void update() {
@@ -149,9 +153,16 @@ public class Gui extends JFrame implements KeyListener {
             collision =pb3;
         }
         repaint();
-
     }
-
+    public void drawHand()
+    {
+        Point p = new Point(0,cardPanel.getHeight()-300);
+        for(JLabel i : hand)
+        {
+            i.setLocation(p);
+            p.x+=220;
+        }
+    }
 
     public void createCard(Card c)
     {
@@ -164,27 +175,38 @@ public class Gui extends JFrame implements KeyListener {
         cardPanel.add(card);
         card.setVisible(true);
         this.repaint();
-        //Drag variables
-        boolean dragable = true;
+        //Add to hand
+        hand.add(card);
+        drawHand();
         //Dragging
         Point clickOffset = new Point();
         MouseAdapter dragAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                currentLabel=card;
-                clickOffset.x = e.getX();
-                clickOffset.y = e.getY();
+                if (e.getButton() == MouseEvent.BUTTON1) { // left click only
+                    currentLabel = card;
+                    clickOffset.x = e.getX();
+                    clickOffset.y = e.getY();
+                    hand.remove(card);
+                    drawHand();
+                    System.out.println("mouse pressed");
+                }
             }
+
             @Override
             public void mouseDragged(MouseEvent e) {
-                if(dragable==true) {
+                if (currentLabel == card && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
                     int x = card.getX() + e.getX() - clickOffset.x;
                     int y = card.getY() + e.getY() - clickOffset.y;
                     card.setLocation(x, y);
                 }
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (currentLabel != card || !SwingUtilities.isLeftMouseButton(e)) return;
+
+                System.out.println("mouse released");
                 Point p = SwingUtilities.convertPoint(
                         card,
                         e.getPoint(),
@@ -195,8 +217,12 @@ public class Gui extends JFrame implements KeyListener {
 
                 }
                 else {
-
+                    // Add back to hand
+                    hand.add(card);
+                    drawHand();
                 }
+
+                currentLabel = null;
             }
         };
         card.addMouseListener(dragAdapter);
