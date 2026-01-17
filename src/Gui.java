@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Gui extends JFrame implements KeyListener {
     boolean paused = true;
@@ -14,11 +15,13 @@ public class Gui extends JFrame implements KeyListener {
     JLabel elementPlacebox;
     JLabel spellPlacebox;
     JLabel elementPlacebox2;
-
+    //For checking if a placebox is available
+    JLabel elementPlaced1;
+    JLabel elementPlaced2;
+    JLabel spellPlaced1;
     //ArrayLists
     ArrayList<Card> deck = new ArrayList<>();
     ArrayList<JLabel> hand = new ArrayList<>();
-    ArrayList<JLabel> attack = new ArrayList<>();
 
     //Current card
     JLabel currentLabel;
@@ -111,9 +114,11 @@ public class Gui extends JFrame implements KeyListener {
         timer.start();
 
         Card fire = new ElementCard(Element.FIRE);
-        createCard(fire);
-        createCard(fire);
-        createCard(fire);
+        Card water = new ElementCard(Element.WATER);
+        Card earth = new ElementCard(Element.EARTH);
+        deck.add(fire);
+        deck.add(water);
+        deck.add(earth);
         drawHand();
         setVisible(true);
     }
@@ -149,16 +154,16 @@ public class Gui extends JFrame implements KeyListener {
         else if(cl.intersects(pb2))
         {
             collision = pb2;
-            collisionType = 1;
+            collisionType = 2;
         }
         else if(cl.intersects(pb3))
         {
             collision = pb3;
-            collisionType = 2;
+            collisionType = 3;
         }
         repaint();
     }
-    public void drawHand()
+    public void refreshHand()
     {
         Point p = new Point(0,cardPanel.getHeight()-300);
         for(JLabel i : hand)
@@ -166,6 +171,19 @@ public class Gui extends JFrame implements KeyListener {
             i.setLocation(p);
             p.x+=220;
         }
+    }
+    public void drawHand()
+    {
+        ArrayList<Card> deckCopy = new ArrayList<>(deck);
+        hand.clear();
+        for(int i = 0; i<5 && !deckCopy.isEmpty();i++)
+        {
+            Random randomNum = new Random();
+            int rn = randomNum.nextInt(deckCopy.size());
+            createCard(deckCopy.get(rn));
+            deckCopy.remove(rn);
+        }
+        refreshHand();
     }
 
     public void createCard(Card c)
@@ -185,8 +203,6 @@ public class Gui extends JFrame implements KeyListener {
             card = new JLabel();
         }
 
-
-
         card.setBounds(0,0,200,300);
         card.setBackground(Color.BLACK);
         card.setForeground(Color.WHITE);
@@ -196,7 +212,7 @@ public class Gui extends JFrame implements KeyListener {
         this.repaint();
         //Add to hand
         hand.add(card);
-        drawHand();
+        refreshHand();
         //Dragging
         Point clickOffset = new Point();
         MouseAdapter dragAdapter = new MouseAdapter() {
@@ -207,7 +223,19 @@ public class Gui extends JFrame implements KeyListener {
                     clickOffset.x = e.getX();
                     clickOffset.y = e.getY();
                     hand.remove(card);
-                    drawHand();
+                    if(elementPlaced1==card)
+                    {
+                        elementPlaced1=null;
+                    }
+                    else if(elementPlaced2==card)
+                    {
+                        elementPlaced2=null;
+                    }
+                    else if(spellPlaced1==card)
+                    {
+                        spellPlaced1=null;
+                    }
+                    refreshHand();
                 }
             }
             @Override
@@ -231,23 +259,31 @@ public class Gui extends JFrame implements KeyListener {
                 if (collision != null && collision.contains(p)) {
                     //String rest = str.substring(1);
                     char CardType = card.getText().charAt(0);
-                    if (collisionType==1&&CardType=='1') {
-                        attack.add(card);
-                        System.out.println("hey");
+                    Point elementPBox1Location = SwingUtilities.convertPoint(elementPlacebox.getParent(), elementPlacebox.getLocation(), layers);
+                    Point elementPBox2Location = SwingUtilities.convertPoint(elementPlacebox2.getParent(), elementPlacebox2.getLocation(), layers);
+                    Point spellPBoxLocation = SwingUtilities.convertPoint(spellPlacebox.getParent(), spellPlacebox.getLocation(), layers);
+                    if (collisionType==1&&CardType=='1'&&elementPlaced1==null) {
+                        elementPlaced1=card;
+                        card.setLocation(elementPBox1Location);
                     }
-                    else if(collisionType==2&&CardType=='2') {
-                        attack.add(card);
+                    else if(collisionType==2&&CardType=='1'&&elementPlaced2==null) {
+                        elementPlaced2=card;
+                        card.setLocation(elementPBox2Location);
+                    }
+                    else if(collisionType==3&&CardType=='2'&&spellPlaced1==null) {
+                        spellPlaced1=card;
+                        card.setLocation(spellPBoxLocation);
                     }
                     else {
                         //Add back to hand
                         hand.add(card);
-                        drawHand();
+                        refreshHand();
                     }
                 }
                 else {
                     // Add back to hand
                     hand.add(card);
-                    drawHand();
+                    refreshHand();
                 }
 
                 currentLabel = null;
