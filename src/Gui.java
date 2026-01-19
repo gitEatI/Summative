@@ -46,6 +46,7 @@ public class Gui extends JFrame implements KeyListener {
     int playerHealth;
     int defense;
     Element buff;
+    int buffDuration;
 
     boolean playerTurn;
     JButton attackButton;
@@ -142,14 +143,12 @@ public class Gui extends JFrame implements KeyListener {
                         if(Arrays.asList(singleElements).contains(element))
                         {
                             //Start player turn
-                            playerTurn=false;
                             playerAttack();
                         }
                     }
                     else
                     {
                         //Start player turn
-                        playerTurn=false;
                         playerAttack();
                     }
                 }
@@ -210,18 +209,36 @@ public class Gui extends JFrame implements KeyListener {
         playerTurn = true;
     }
     public void enemyAttack()
-    {}
+    {
+        //Always protects from damage
+        playerTurn=false;
+        if(defense>0)
+        {
+            defense-=currentEnemy.damage();
+        }
+        else {
+            playerHealth-= currentEnemy.damage();
+        }
+        checkResult();
+    }
     public void playerAttack()
     {
+        playerTurn=true;
         int damage_ = 10;
         int defense_ = 10;
         int combineLevel;
         Element buff_=null;
+        if(buffDuration>0) {
+            buffDuration-=1;
+        }
+        else {
+            buffDuration=0;
+        }
 
         String elementString = getTypeString(elementPlaced);
         Element element = Element.valueOf(elementString.trim().toUpperCase());
         String spellString = getTypeString(spellPlaced);
-        Spell spell = Spell.valueOf(elementString.trim().toUpperCase());
+        Spell spell = Spell.valueOf(spellString.trim().toUpperCase());
         //Combination level
         if(Arrays.asList(tripleElements).contains(element))
         {
@@ -253,6 +270,40 @@ public class Gui extends JFrame implements KeyListener {
             }
             else if(Arrays.asList(specialElements).contains(element)){
                 damage_ *=2;
+            }
+            //Buffs
+            if(buffDuration>0)
+            {
+                switch (buff_) {
+                    case FIRE -> {
+                        if(Arrays.asList(fireElements).contains(element)) {
+                            damage_ *=2;
+                        }
+                    }
+                    case WATER -> {
+                        if(Arrays.asList(waterElements).contains(element)) {
+                            damage_ *=2;
+                        }
+                    }
+                    case EARTH -> {
+                        if(Arrays.asList(earthElements).contains(element)) {
+                            damage_ *=2;
+                        }
+                    }
+                    case WIND -> {
+                        if(Arrays.asList(windElements).contains(element)) {
+                            damage_ *=2;
+                        }
+                    }
+                    case LIGHTNING -> {
+                        if(Arrays.asList(lightingElements).contains(element)) {
+                            damage_ *=2;
+                        }
+                    }
+                    default->{
+
+                    }
+                }
             }
             //Enemy weaknesses
             if(currentEnemy.getSpellWeakness()==spell)
@@ -306,6 +357,7 @@ public class Gui extends JFrame implements KeyListener {
         }
         else//buff
         {
+            buffDuration = 2;
             switch (element) {
                 case FIRE -> {
                     buff_ =Element.FIRE;
@@ -330,16 +382,36 @@ public class Gui extends JFrame implements KeyListener {
         defense += defense_;
         buff=buff_;
 
+        checkResult();
     }
-//    public void checkWin()
-//    {
-//        if(playerHealth>0||currentEnemy.gethealth()<0)
-//        {
-//
-//        }
-//    }
+    public void checkResult()
+    {
+        if(currentEnemy.gethealth()<=0)
+        {
+            buyStage();
+        }
+        else if(playerHealth<=0)
+        {
+            //Highscore
+        }
+        else
+        {
+            if(playerTurn=true)
+            {
+                enemyAttack();
+            }
+            else
+            {
+                playerAttack();
+            }
+
+        }
+
+    }
     public void buyStage()
-    {}
+    {
+
+    }
 
 
 
