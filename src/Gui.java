@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Gui extends JFrame implements KeyListener {
@@ -36,10 +37,19 @@ public class Gui extends JFrame implements KeyListener {
     //Element types
     Element[] physicalElements = {Element.FIRE,Element.WATER,Element.MOUNTAIN,Element.TSUNAMI, Element.QUICK, Element.WOOD, Element.ICE, Element.SAND, Element.LAVA, Element.GLASS, Element.SLIME,Element.METAL,Element.GLACIER};
     Element[] specialElements ={Element.FIRE,Element.WIND,Element.LIGHTNING,Element.BLAZE,Element.GUST,Element.VOLT,Element.STEAM,Element.SCORCH, Element.STORM,Element.PLASMA,Element.BLOOD,Element.MAGNET};
-    //Element cobinations
+    //Element combinations
+    Element[] singleElements = {Element.FIRE,Element.WATER,Element.EARTH,Element.LIGHTNING,Element.WIND};
+    Element[] tripleElements = {Element.GLACIER,Element.BLOOD,Element.GLASS,Element.SLIME,Element.METAL};
     ElementCombinations elementCombinations = new ElementCombinations();
 
-    int difficulty = 1;
+    int difficulty;
+    int playerHealth;
+    int defense;
+    Element buff;
+
+    boolean playerTurn;
+    JButton attackButton;
+    Enemy currentEnemy;
 
     public Gui() {
         //Set frame
@@ -102,7 +112,49 @@ public class Gui extends JFrame implements KeyListener {
             i.setBackground(Color.BLACK);
             i.setForeground(Color.WHITE);
         }
+        //Add attackButton
+        attackButton = new JButton("ATTACK");
+        attackButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        attackButton.setForeground(Color.WHITE);
+        attackButton.setBackground(Color.BLACK);
 
+        attackButton.setFocusPainted(false);
+        attackButton.setBorderPainted(false);
+        attackButton.setContentAreaFilled(true);
+        attackButton.setOpaque(true);
+        Dimension attackButtonSize = new Dimension(200, 100);
+        attackButton.setPreferredSize(attackButtonSize);
+        attackButton.setMaximumSize(attackButtonSize);
+
+        attackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Checks if it is the players turn to move and if both card slots are filled
+                if(playerTurn&&elementPlaced!=null&&spellPlaced!=null)
+                {
+                    String elementString = getTypeString(elementPlaced);
+                    Element element = Element.valueOf(elementString.trim().toUpperCase());
+                    String spellString = getTypeString(spellPlaced);
+                    Spell spell = Spell.valueOf(spellString.trim().toUpperCase());
+                    //Stop combined elements while using a buff spell
+                    if(spell==Spell.BuffSpell)
+                    {
+                        if(Arrays.asList(singleElements).contains(element))
+                        {
+                            //Start player turn
+                            playerTurn=false;
+                            playerAttack();
+                        }
+                    }
+                    else
+                    {
+                        //Start player turn
+                        playerTurn=false;
+                        playerAttack();
+                    }
+                }
+            }
+        });
         //Center horizontally using glue and struts
         horizontalWrapper.add(Box.createHorizontalGlue());
         horizontalWrapper.add(combinePlacebox);
@@ -110,6 +162,8 @@ public class Gui extends JFrame implements KeyListener {
         horizontalWrapper.add(elementPlacebox);
         horizontalWrapper.add(Box.createHorizontalStrut(150));
         horizontalWrapper.add(spellPlacebox);
+        horizontalWrapper.add(Box.createHorizontalStrut(150));
+        horizontalWrapper.add(attackButton);
         horizontalWrapper.add(Box.createHorizontalStrut(150));
         horizontalWrapper.add(Box.createHorizontalGlue());
 
@@ -140,26 +194,156 @@ public class Gui extends JFrame implements KeyListener {
         deck.add(wind);
         deck.add(lighting);
 
-
-        drawHand();
         setVisible(true);
-        while(true)
-        {
-            Enemy enemy = createRandomEnemy(difficulty);
-            while()
-        }
-        //create enemy
-        //battle loop
 
+        difficulty = 1;
+        playerHealth=100;
+        defense=0;
+        buff=null;
+
+        startBattle();
+    }
+    public void startBattle()
+    {
+        currentEnemy = createRandomEnemy(difficulty);
         drawHand();
-        //buy stage
-        //add difficulty
+        playerTurn = true;
+    }
+    public void enemyAttack()
+    {}
+    public void playerAttack()
+    {
+        int damage_ = 10;
+        int defense_ = 10;
+        int combineLevel;
+        Element buff_=null;
 
+        String elementString = getTypeString(elementPlaced);
+        Element element = Element.valueOf(elementString.trim().toUpperCase());
+        String spellString = getTypeString(spellPlaced);
+        Spell spell = Spell.valueOf(elementString.trim().toUpperCase());
+        //Combination level
+        if(Arrays.asList(tripleElements).contains(element))
+        {
+            combineLevel=3;
+        }
+        else if(!Arrays.asList(singleElements).contains(element))
+        {
+            combineLevel=2;
+        }
+        else
+        {
+            combineLevel=1;
+        }
+        //Spell type and calculations
+        if(spell == Spell.PhysicalSpell||spell == Spell.ElementalSpell)
+        {
+            //combination damage_
+            if(combineLevel==2)
+            {
+                damage_ *=2;
+            }
+            if(combineLevel==3)
+            {
+                damage_ *=5;
+            }
+            //Spell matching element
+            if(spell == Spell.PhysicalSpell&&Arrays.asList(physicalElements).contains(element)) {
+                damage_ *=2;
+            }
+            else if(Arrays.asList(specialElements).contains(element)){
+                damage_ *=2;
+            }
+            //Enemy weaknesses
+            if(currentEnemy.getSpellWeakness()==spell)
+            {
+                damage_ *=2;
+            }
+            switch (currentEnemy.getElementalWeakness()) {
+                case FIRE -> {
+                    if (Arrays.asList(fireElements).contains(element)) {
+                        damage_ *=3;
+                    }
+                }
+                case WATER -> {
+                    if (Arrays.asList(waterElements).contains(element)) {
+                        damage_ *=3;
+                    }
+                }
+                case EARTH -> {
+                    if (Arrays.asList(earthElements).contains(element)) {
+                        damage_ *=3;
+                    }
+                }
+                case WIND -> {
+                    if (Arrays.asList(windElements).contains(element)) {
+                        damage_ *=3;
+                    }
+                }
+                case LIGHTNING -> {
+                    if (Arrays.asList(lightingElements).contains(element)) {
+                        damage_ *=3;
+                    }
+                }
+            }
 
-
+        }
+        else if(spell == Spell.BlockSpell)
+        {
+            //Combination bonus
+            if(combineLevel==2)
+            {
+                defense_*=2;
+            }
+            if(combineLevel==3)
+            {
+                defense_*=5;
+            }
+            if(Arrays.asList(physicalElements).contains(element))
+            {
+                defense_*=3;
+            }
+        }
+        else//buff
+        {
+            switch (element) {
+                case FIRE -> {
+                    buff_ =Element.FIRE;
+                }
+                case WATER -> {
+                    buff_ =Element.WATER;
+                }
+                case EARTH -> {
+                    buff_ =Element.EARTH;
+                }
+                case WIND -> {
+                    buff_ =Element.WIND;
+                }
+                case LIGHTNING -> {
+                    buff_ =Element.LIGHTNING;
+                }
+                default->{
+                    buff_=null;
+                }
+            }
+        }
+        defense += defense_;
+        buff=buff_;
 
     }
-    private Enemy createRandomEnemy(int difficulty)
+//    public void checkWin()
+//    {
+//        if(playerHealth>0||currentEnemy.gethealth()<0)
+//        {
+//
+//        }
+//    }
+    public void buyStage()
+    {}
+
+
+
+    public Enemy createRandomEnemy(int difficulty)
     {
         int randomNum = (int)(Math.random() * 5) + 1;
         Element elementalWeakness;
@@ -184,7 +368,7 @@ public class Gui extends JFrame implements KeyListener {
         return new Enemy(elementalWeakness, spellWeakness, health, damage);
     }
 
-    private void update() {
+    public void update() {
         if (currentLabel == null) {
             return;
         }

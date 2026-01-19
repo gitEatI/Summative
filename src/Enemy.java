@@ -10,5 +10,21 @@ public class Enemy {
         this.health = h;
         this.damage = d;
     }
+    public Element getElementalWeakness()
+    {
+        return elementalWeakness;
+    }
+    public Spell getSpellWeakness()
+    {
+        return spellWeakness;
+    }
+    public int gethealth()
+    {
+        return health;
+    }
+    public int damage()
+    {
+        return damage;
+    }
 
 }
