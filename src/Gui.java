@@ -41,7 +41,8 @@ public class Gui extends JFrame implements KeyListener {
     Element[] singleElements = {Element.FIRE,Element.WATER,Element.EARTH,Element.LIGHTNING,Element.WIND};
     Element[] tripleElements = {Element.GLACIER,Element.BLOOD,Element.GLASS,Element.SLIME,Element.METAL};
     ElementCombinations elementCombinations = new ElementCombinations();
-
+    //Buy stage
+    JPanel buyPanel;
     int difficulty;
     int playerHealth;
     int defense;
@@ -175,7 +176,12 @@ public class Gui extends JFrame implements KeyListener {
         verticalWrapper.add(Box.createVerticalGlue());
 
         placementPanel.add(verticalWrapper, BorderLayout.EAST);
-
+        //Buy panel
+        buyPanel = new JPanel();
+        layers.add(buyPanel,JLayeredPane.POPUP_LAYER);
+        buyPanel.setOpaque(false);
+        buyPanel.setBounds(0,0,layers.getWidth(),layers.getHeight());
+        buyPanel.setLayout(new BoxLayout(buyPanel, BoxLayout.X_AXIS));
         setVisible(true);
 
         //Set timer to check collisions
