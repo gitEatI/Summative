@@ -270,7 +270,7 @@ public class Gui extends JFrame implements KeyListener {
         drawHand();
         playerTurn = true;
         int damage_ = 1;
-        int defense_ = 10;
+        int defense_ = 0;
         int combineLevel;
         Element buff_ = null;
 
@@ -395,6 +395,7 @@ public class Gui extends JFrame implements KeyListener {
         }
         else if(spell == Spell.BlockSpell)
         {
+            defense_=10;
             //Combination bonus
             if(combineLevel == 2)
             {
@@ -415,7 +416,7 @@ public class Gui extends JFrame implements KeyListener {
             elementPlaced = null;
             spellPlaced = null;
         }
-        else //buff
+        else if(spell == Spell.BuffSpell)
         {
             buffDuration = 2;
             switch (element) {
