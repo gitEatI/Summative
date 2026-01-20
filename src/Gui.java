@@ -482,6 +482,7 @@ public class Gui extends JFrame implements KeyListener {
                             "Buff: " + (buff != null ? buff.name() : "None") + "<br>" +
                             "Buff Duration: " + buffDuration + "<br>" +
                             "Enemy Health: " + currentEnemy.gethealth() + "<br>" +
+                            "Enemy Damage: " + currentEnemy.damage() + "<br>" +
                             "Element Weakness: " + currentEnemy.getElementalWeakness().name() + "<br>" +
                             "Spell Weakness: " + currentEnemy.getSpellWeakness().name() + "<br>" +
                             "Coins: " + coins + "<br>" +
