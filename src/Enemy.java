@@ -26,5 +26,9 @@ public class Enemy {
     {
         return damage;
     }
+    public void dealDamage(int d)
+    {
+        health-=d;
+    }
 
 }
