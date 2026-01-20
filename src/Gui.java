@@ -267,6 +267,7 @@ public class Gui extends JFrame implements KeyListener {
     }
     public void playerAttack()
     {
+        this.requestFocusInWindow();
         drawHand();
         playerTurn = true;
         int damage_ = 1;
@@ -601,8 +602,8 @@ public class Gui extends JFrame implements KeyListener {
         } else {
             spellWeakness = Spell.ElementalSpell;
         }
-        int health = (int)(Math.random()*9*difficulty);
-        int damage = (int)(Math.random()*9*difficulty);
+        int health = (int)(Math.random()+1*difficulty);
+        int damage = (int)(Math.random()+1*difficulty);
 
         return new Enemy(elementalWeakness, spellWeakness, health, damage);
     }
