@@ -917,10 +917,10 @@ public class Gui extends JFrame implements KeyListener {
 
         String imagePath = null;
 
-        // Determine image path based on card type
+        // Card Type
         char cardType = cardText.charAt(0);
-
-        if (cardType == '1') { // Element Card
+        // Element Card
+        if (cardType == '1') {
             try {
                 Element element = Element.valueOf(typeString.trim().toUpperCase());
                 imagePath = switch (element) {
@@ -969,12 +969,11 @@ public class Gui extends JFrame implements KeyListener {
             }
         }
 
-        // Load and apply the image
         if (imagePath != null) {
             try {
                 ImageIcon originalIcon = new ImageIcon(getClass().getResource(imagePath));
 
-                // Scale image to fit 200x300 bounds
+                // Scale image to 200x300
                 Image scaledImage = originalIcon.getImage().getScaledInstance(
                         200, 300, Image.SCALE_SMOOTH
                 );
@@ -983,7 +982,7 @@ public class Gui extends JFrame implements KeyListener {
                 cardButton.setIcon(scaledIcon);
 
             } catch (Exception e) {
-                System.out.println("Error loading image: " + imagePath + " - " + e.getMessage());
+                System.out.println("Error");
             }
         }
     }
@@ -999,10 +998,11 @@ public class Gui extends JFrame implements KeyListener {
             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
             if (paused) {
+                //Reset flowPanel
                 flowPanel.removeAll();
                 flowPanel.setVisible(false);
                 flowPanel.setOpaque(true);
-                // Hide X - go back to fullscreen borderless
+                //Go back to full screen
                 paused = false;
                 gd.setFullScreenWindow(null);
                 dispose();
@@ -1011,14 +1011,14 @@ public class Gui extends JFrame implements KeyListener {
                 gd.setFullScreenWindow(this); // Fullscreen
             }
             else {
-                // Show X - exit fullscreen and show title bar
+                //Remove full screen and add back the x
                 paused = true;
                 gd.setFullScreenWindow(null);
                 dispose();
-                setUndecorated(false); // Add title bar (show X)
+                setUndecorated(false);
                 setVisible(true);
-                setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize
-                //Go through the players deck
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //Go through the players deck and add it to the flowPanel
                 flowPanel.removeAll();
                 flowPanel.setVisible(true);
                 flowPanel.setOpaque(true);
