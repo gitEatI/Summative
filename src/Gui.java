@@ -11,7 +11,6 @@ public class Gui extends JFrame implements KeyListener {
     //Layer panels
     JPanel placementPanel;
     JPanel cardPanel;
-
     //Card placement hitboxes
     JLabel combinePlacebox;
     JLabel spellPlacebox;
@@ -28,6 +27,7 @@ public class Gui extends JFrame implements KeyListener {
     JLabel currentLabel;
     Rectangle collision;
     int collisionType;//1 or 2
+    //CATEGORIES FOR CARDS:
     //Element arrays
     Element[] fireElements = {Element.FIRE, Element.BLAZE, Element.SCORCH,Element.PLASMA,Element.STEAM,Element.LAVA,Element.GLASS,Element.METAL,Element.BLOOD};
     Element[] waterElements = {Element.WATER,Element.STEAM, Element.ICE, Element.STORM,Element.WOOD,Element.TSUNAMI,Element.SLIME,Element.GLACIER,Element.BLOOD};
@@ -49,26 +49,27 @@ public class Gui extends JFrame implements KeyListener {
     int defense;
     Element buff;
     int buffDuration;
-
+    //Game logic
     boolean playerTurn;
     JButton attackButton;
     Enemy currentEnemy;
-
+    //Stats
     JPanel statsPanel;
     JLabel statsLabel;
     public Gui() {
-        //Set frame
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+        //Make the frame, fullscreen and keyListener
         addKeyListener(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         setLayout(null);
-
-        gd.setFullScreenWindow(null);
         dispose();
-        setUndecorated(true); // Remove title bar (hide X)
+        setUndecorated(true);
         setVisible(true);
-        gd.setFullScreenWindow(this); // Fullscreen
+        //FullScreen
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        gd.setFullScreenWindow(null);
+        gd.setFullScreenWindow(this);
         paused=false;
 
         //Layered pane
@@ -182,7 +183,7 @@ public class Gui extends JFrame implements KeyListener {
         verticalWrapper.add(Box.createVerticalGlue());
         placementPanel.add(verticalWrapper, BorderLayout.EAST);
 
-//Stats panel
+        //Stats panel
         statsPanel = new JPanel();
         statsPanel.setOpaque(false);
         statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
@@ -193,7 +194,7 @@ public class Gui extends JFrame implements KeyListener {
         statsLabel.setBackground(Color.BLACK);
         statsLabel.setOpaque(true);
 
-// Add vertical spacing with glue
+        // Add vertical spacing with glue
         statsPanel.add(Box.createVerticalGlue()); // Pushes content to top
         statsPanel.add(Box.createVerticalStrut(20)); // Space from top
         statsPanel.add(statsLabel);
@@ -211,9 +212,10 @@ public class Gui extends JFrame implements KeyListener {
         flowPanel.setVisible(false); // Hide it initially
 
         //Set timer to check collisions
-        Timer timer = new Timer(16, e -> update()); // ~60 FPS
+        Timer timer = new Timer(16, e -> update());
         timer.start();
 
+        //Create example cards
         Card wind = new ElementCard(Element.WIND);
         Card earth = new ElementCard(Element.EARTH);
         Card lighting = new ElementCard(Element.LIGHTNING);
@@ -236,6 +238,7 @@ public class Gui extends JFrame implements KeyListener {
 
         setVisible(true);
 
+        //Start game logic
         difficulty = 1;
         playerHealth=100;
         defense=0;
@@ -255,7 +258,6 @@ public class Gui extends JFrame implements KeyListener {
     public void enemyAttack()
     {
         //Always protects from damage
-        playerTurn=false;
         if(defense>0)
         {
             defense-=currentEnemy.damage();
@@ -263,13 +265,13 @@ public class Gui extends JFrame implements KeyListener {
         else {
             playerHealth-= currentEnemy.damage();
         }
+        playerTurn=true;
         checkResult();
     }
     public void playerAttack()
     {
         this.requestFocusInWindow();
         drawHand();
-        playerTurn = true;
         int damage_ = 1;
         int defense_ = 0;
         int combineLevel;
@@ -437,6 +439,7 @@ public class Gui extends JFrame implements KeyListener {
         }
         defense += defense_;
         buff = buff_;
+        playerTurn = false;
         rewriteStats();
         checkResult();
     }
@@ -460,7 +463,7 @@ public class Gui extends JFrame implements KeyListener {
         }
         else
         {
-            if(playerTurn)
+            if(!playerTurn)
             {
                 enemyAttack();
             }
@@ -581,8 +584,6 @@ public class Gui extends JFrame implements KeyListener {
         };
     }
 
-
-
     public Enemy createRandomEnemy(int difficulty)
     {
         int randomNum = (int)(Math.random() * 5) + 1;
@@ -602,8 +603,13 @@ public class Gui extends JFrame implements KeyListener {
         } else {
             spellWeakness = Spell.ElementalSpell;
         }
-        int health = (int)(Math.random()+1*difficulty);
-        int damage = (int)(Math.random()+1*difficulty);
+
+        int baseHealth = 20;
+        int baseDamage = 5;
+
+        int health = baseHealth + (difficulty * 10);
+
+        int damage = baseDamage + (difficulty * 3);
 
         return new Enemy(elementalWeakness, spellWeakness, health, damage);
     }
